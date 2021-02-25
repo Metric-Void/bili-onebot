@@ -34,8 +34,5 @@ async function main() {
 
     live_init(socket)
     dyno_init(socket)
-
-    let result = await biliAPI({mid: 7528074}, ['dynamics', 'uname'])
-    dynamics_notify(socket, result, [result.dynamics[10], result.dynamics[11]])
 }
 

@@ -4,8 +4,8 @@ const async = require("async")
 const DYNO_CODE = { 1: 'REPOST', 2: 'PIC_POST', 4: 'TEXT_POST', 8: 'VIDEO', 4200: 'LIVEROOM' }
 
 /**
- * 
- * @param {OnebotSocket} socket Onebot socket to send message on
+ * Send notification about a liveroom update.
+ * @param {OnebotSocket} socket Onebot socket to send message on.
  * @param {Object} roomInfo Room info JSON.
  */
 function live_notify(socket, roomInfo) {
@@ -33,6 +33,12 @@ function _pic_dyn_body(dynItem) {
     return builder
 }
 
+/**
+ * Send notification about a dynamics update.
+ * @param {OnebotSocket} socket The Onebot socket to send messages with.
+ * @param {any} rawObj Raw request object from bili-api. Additional data can be fetched here.
+ * @param {Array} dynList List of dynamics to send.
+ */
 function dynamics_notify(socket, rawObj, dynList) {
     let groups = global.bili_config.conf.dynamics.mids[rawObj.mid.toString()].groups
 

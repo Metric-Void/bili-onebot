@@ -22,6 +22,12 @@ function rand_string(n) {
     return rs
 }
 
+/**
+ * Promisified sending. Will return a promise that indicates whether the server responded OK.
+ * And retrieve the ID of the sent message, etc.
+ * @param {OnebotSocket} socket The socket to send message and receive echo on.
+ * @param {any} data The data to send.
+ */
 async function promisifiedSend(socket, data) {
     let promise =  new Promise((resolve, reject) => {
         socket.getEchoListeners().once(data.echo, (socketMsg)=> {
@@ -36,6 +42,11 @@ async function promisifiedSend(socket, data) {
     return promise
 }
 
+/**
+ * Generate a request about sending private chat.
+ * @param {int} target The target to send message to.
+ * @param {string} content The content to send.
+ */
 function _priv_msg_request(target, content) {
     return {
         action: "send_private_msg",
@@ -47,6 +58,11 @@ function _priv_msg_request(target, content) {
     }
 }
 
+/**
+ * Generate a request about sending group chat.
+ * @param {OnebotSocket} target The target to send message to.
+ * @param {string} content The content to send.
+ */
 function _grp_msg_request(target, content) {
     return {
         action: "send_group_msg",
@@ -61,7 +77,7 @@ function _grp_msg_request(target, content) {
 /**
  * Send a private message, and listen the socket for a response.
  * @param {OnebotSocket} socket the socket to operate on.
- * @param {BigInt} target QQ ID of the receiver
+ * @param {int} target QQ ID of the receiver
  * @param {string} content Message to send. 
  */
 async function sendPrivMsg(socket, target, content) {
@@ -79,14 +95,31 @@ async function sendPrivMsgNr(socket, target, content) {
     socket.ws.send(JSON.stringify(_priv_msg_request(target, content)))
 }
 
+/**
+ * Send a group message, and listen the socket for a response.
+ * @param {OnebotSocket} socket the socket to operate on.
+ * @param {int} target Group ID of the receiver
+ * @param {string} content Message to send. 
+ */
 async function sendGrpMsg(socket, target, content) {
     promisifiedSend(socket, _grp_msg_request(target, content))
 }
 
+/**
+ * Send a group message, but does not care whether it has been sent successfully.
+ * @param {OnebotSocket} socket the socket to operate on.
+ * @param {int} target Group ID of the receiver
+ * @param {string} content Message to send. 
+ */
 async function sendGrpMsgNr(socket, target, content) {
     socket.ws.send(JSON.stringify(_grp_msg_request(target, content)))
 }
 
+/**
+ * Recall a message.
+ * @param {OnebotSocket} socket The socket to operate on.
+ * @param {*} msg_id The ID of the message to recall.
+ */
 async function deleteMsg(socket, msg_id) {
     socket.ws.send(JSON.stringify({
         action: "delete_msg",

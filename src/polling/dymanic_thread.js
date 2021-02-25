@@ -6,6 +6,11 @@ const async = require('async')
 var lastDynamic = new Object()
 var timer = null
 
+/**
+ * Routine function for polling dynamics.
+ * @param {OnebotSocket} socket The socket to send message with.
+ * @param {boolean} firstRun Whether this is the first run.
+ */
 async function dynoRunner(socket, firstRun) {
     console.log("Running dynamics check...")
     
@@ -21,7 +26,7 @@ async function dynoRunner(socket, firstRun) {
 
             if(!firstRun && lastDynamic[x] != thisDynamic[x]) {
                 let index = 0
-                while(result.dynamics[0].dynamic_id != lastDynamic[x] && index < result.dynamics.length) index += 1
+                while(result.dynamics[index].dynamic_id != lastDynamic[x] && index < result.dynamics.length) index += 1
                 dynamics_notify(socket, result, result.dynamics.slice(0, index + 1))
             }
         } catch(e) {
@@ -37,10 +42,14 @@ async function dynoRunner(socket, firstRun) {
     })
 }
 
+/**
+ * Initialize the dynamics polling routine
+ * @param {OnebotSocket} socket Onebot Socket to send messages on.
+ */
 function dyno_init(socket) {
     dynoRunner(socket, true)
     if(timer) clearInterval(timer)
-    timer = setInterval(dynoRunner, global.bili_config.conf.dynamics.checkInterval * 1000, false)
+    timer = setInterval(dynoRunner, global.bili_config.conf.dynamics.checkInterval * 1000, socket, false)
 }
 
 module.exports = {

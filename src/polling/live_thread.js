@@ -10,7 +10,7 @@ var lastStatus = new Object()
 const DEBUG = false
 
 /**
- * Live status thread. Should be registered as a periodical task.
+ * Routine function for polling liveroom status.
  * @param {OnebotSocket} socket The socket to send notifications on.
  * @param {bool} firstRun Indicates if this is the first run.
  */
@@ -41,6 +41,10 @@ async function liveStatusRunner(socket, firstRun) {
     })
 }
 
+/**
+ * Initialize the live thread.
+ * @param {OnebotSocket} socket The socket to send messages on.
+ */
 function live_init(socket) {
     liveStatusRunner(socket, true)
     runner = setInterval(liveStatusRunner, global.bili_config.conf.live.checkInterval * 1000, socket, false)
