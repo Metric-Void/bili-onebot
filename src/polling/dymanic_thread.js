@@ -12,7 +12,7 @@ var timer = null
  * @param {boolean} firstRun Whether this is the first run.
  */
 async function dynoRunner(socket, firstRun) {
-    console.log("Running dynamics check...")
+    console.log("[dyno_thread] Running dynamics check...")
     
     let mids = global.bili_config.conf.dynamics.mids
     let thisDynamic = new Object()
@@ -20,25 +20,28 @@ async function dynoRunner(socket, firstRun) {
     async.forEachOf(mids, async (value, x, callback) => {
         try {
             let result = await biliAPI({mid: parseInt(x)}, ['dynamics', 'uname'])
-            console.log(`Dynamic fetch for ${x} succeeded.`)
-            if(result.dynamics.length == 0) return;
-            thisDynamic[x] = result.dynamics[0].dynamic_id
+            console.log(`[dyno_thread] Dynamic fetch for ${x} succeeded.`)
+            if(result.dynamics.length == 0) return
+            thisDynamic[x] = result.dynamics[0].dynamic_id_str
 
             if(!firstRun && lastDynamic[x] != thisDynamic[x]) {
                 let index = 0
-                while(result.dynamics[index].dynamic_id != lastDynamic[x] && index < result.dynamics.length) index += 1
+                while(result.dynamics[index].dynamic_id_str != lastDynamic[x] && index < result.dynamics.length) index += 1
                 dynamics_notify(socket, result, result.dynamics.slice(0, index + 1))
             }
+
+            lastDynamic[x] = thisDynamic[x]
         } catch(e) {
-            console.log(`Dynamic fetch for ${x} failed.`)
-            console.log(e)
+            console.error(`[dyno_thread] Dynamic fetch for ${x} failed.`)
+            console.error(e)
         }
     }).then(result => {
-        lastDynamic = thisDynamic
-        console.log("Dynamic Checks all completed.")
+        // lastDynamic = thisDynamic
+        console.log("[dyno_thread] Dynamic Checks all completed.")
     }, reject => {
-        console.log("Some dynamic check failed.")
-        console.log(result)
+        console.error("[dyno_thread] Some dynamic check failed.")
+        // lastDynamic = thisDynamic
+        console.log(reject)
     })
 }
 
