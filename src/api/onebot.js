@@ -2,6 +2,11 @@ const WebSocket = require("ws")
 const ReconnectingWebSocket = require("reconnecting-websocket")
 const events = require("events")
 const { parseEvent } = require('./events')
+const log4js = require('log4js');
+const chalk = require('chalk');
+
+var logger = log4js.getLogger('[connection]');
+logger.level = "trace"
 
 const TIMEOUT = 1000
 
@@ -22,11 +27,11 @@ class OnebotSocket {
                 connectionTimeout: TIMEOUT
             })
             this.ws.addEventListener("open", () => {
-                console.log("WebSocket Connection established.")
+                logger.info("WebSocket Connection established.")
             })
             
             this.ws.addEventListener("close", () => {
-                console.log(`WebSocket Closed. Reconnecting in ${TIMEOUT}`)
+                logger.warn(`WebSocket Closed. Reconnecting in ${chalk.yellow(TIMEOUT + "ms")}`)
             })
 
             this.ws.addEventListener("message", (message) => {
@@ -36,8 +41,8 @@ class OnebotSocket {
                     try {
                         this.socketListeners[i](msg)
                     } catch (e) {
-                        console.log(`Listener ${i} failed.`)
-                        console.log(e)
+                        logger.warn(`Listener ${i} failed.`)
+                        logger.warn(e)
                     }
                 })
                 
@@ -48,7 +53,6 @@ class OnebotSocket {
                 }
             })
         }
-        
     }
     
     /**

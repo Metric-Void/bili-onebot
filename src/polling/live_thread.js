@@ -2,10 +2,13 @@ const biliAPI = require('bili-api')
 const { OnebotSocket } = require('../api/onebot')
 const { live_notify } = require('./notify')
 const async = require('async')
+const log4js = require('log4js');
+const chalk = require('chalk');
 
 var runner = null
-
 var lastStatus = new Object()
+var logger = log4js.getLogger('[live_thread]');
+logger.level = "trace"
 
 const DEBUG = false
 
@@ -15,14 +18,15 @@ const DEBUG = false
  * @param {bool} firstRun Indicates if this is the first run.
  */
 async function liveStatusRunner(socket, firstRun) {
-    console.log("[live_thread] Checking all liverooms...")
+    logger.info(chalk.white("Checking all liverooms..."))
+
     var currentStatus = new Object()
 
     let rooms = Object.keys(global.bili_config.conf.live.rooms)
     // if(rooms.length == 0) return;
 
     async.each(rooms, async (x, callback) => {
-        console.log(`[live_thread] Checking Room ID: ${x}`)
+        logger.trace(`Checking Room ID: ${chalk.blue(x)}`)
         let roomInfo = await biliAPI({roomid: parseInt(x)}, ['liveStatus', 'getRoomInfoOld', 'mid', 'uname'])
 
         currentStatus[x] = roomInfo.liveStatus
@@ -37,12 +41,12 @@ async function liveStatusRunner(socket, firstRun) {
 
         lastStatus[x] = currentStatus[x] // In case other rooms fail.
     }).then(resolve => {
-        console.log("[live_thread] Room status check completed.")
+        logger.info("Room status check all completed.")
         // lastStatus = currentStatus
     }, reject => {
-        console.log("[live_thread] Some liveroom check has failed.")
+        logger.warn("Some liveroom check has failed.")
         // lastStatus = currentStatus
-        console.log(reject)
+        logger.warn(reject)
     })
 }
 
@@ -51,6 +55,7 @@ async function liveStatusRunner(socket, firstRun) {
  * @param {OnebotSocket} socket The socket to send messages on.
  */
 function live_init(socket) {
+    logger.info("Initializing...")
     liveStatusRunner(socket, true)
     runner = setInterval(liveStatusRunner, global.bili_config.conf.live.checkInterval * 1000, socket, false)
 }

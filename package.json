@@ -13,8 +13,11 @@
   "dependencies": {
     "async": "^3.2.0",
     "bili-api": "git+https://github.com/Metric-Void/bili-api.git",
+    "chalk": "^4.1.0",
+    "figlet": "^1.5.0",
     "iconv-lite": "^0.6.2",
     "jschardet": "^2.3.0",
+    "log4js": "^6.3.0",
     "reconnecting-websocket": "^4.4.0",
     "ws": "^7.4.2"
   },
