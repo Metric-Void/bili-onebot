@@ -5,28 +5,34 @@ const { BiliBotConfig } = require("./app/config")
 const { live_init } = require("./polling/live_thread")
 const { dyno_init } = require("./polling/dymanic_thread")
 const biliAPI = require('bili-api')
+const chalk = require('chalk')
+const figlet = require('figlet')
 
 const { dynamics_notify } = require('./polling/notify')
 
 module.exports = main
 
 async function main() {
-    console.log("Main OK.")
-    let socket = await new OnebotSocket("ws", "ws://127.0.0.1:6701")
+    console.log(
+        chalk.green(
+          figlet.textSync('bili-onebot', { horizontalLayout: 'full' })
+        )
+      );
+    console.log(chalk.white("bili-onebot CLI Interface..."))
+
     global.bili_config = new BiliBotConfig("config.json")
 
-    // socket.addWSListener("PrintToConsole", (e) => {
-    //     console.log("Websocket received data.")
-    //     console.log(e)
-    // })
-    
-    // msg.sendPrivMsg(socket, 1124096029, "well").then(() => {console.log("Well -> success")}, () => {console.log("Well -> failure")})
-    // msg.sendPrivMsg(socket, 1124096029, "Does this stuck the script?")
-    // socket.addWSListener("echo", x => {console.log(x)})
-    
-    // socket.getMessageListener().on("private", o => {
-    //     console.log(`Private Message from ${o.user_id} : ${o.message}`)
-    // })
+    global.bili_config = new BiliBotConfig("config.json")
+
+    console.log(chalk.white("[Main] Connecting to " 
+        + chalk.green.bold(global.bili_config.conf.onebot.addr)
+        + " with type "
+        + chalk.green.bold(global.bili_config.conf.onebot.type)
+    ))
+
+    let socket = await new OnebotSocket(
+        global.bili_config.conf.onebot.type, 
+        global.bili_config.conf.onebot.addr)
 
     socket.getMessageListener().on("group", x => {
         parseGroupCommand(socket, x.message, x)

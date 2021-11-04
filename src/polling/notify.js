@@ -18,7 +18,6 @@ function live_notify(socket, roomInfo) {
             } else {
                 msgStr = eval(`\`${global.bili_config.conf.strings["d-live-up"]}\``)
             }
-            console.log(`Sending ${msgStr} to ${group}`)
             msg.sendGrpMsgNr(socket, group, msgStr)
         })
     } else {
@@ -29,7 +28,6 @@ function live_notify(socket, roomInfo) {
             } else {
                 msgStr = eval(`\`${global.bili_config.conf.strings["d-live-down"]}\``)
             }
-            console.log(`Sending ${msgStr} to ${group}`)
             msg.sendGrpMsgNr(socket, group, msgStr)
         })
     }
