@@ -12,7 +12,7 @@ module.exports = main
 
 async function main() {
     console.log("Main OK.")
-    let socket = await new OnebotSocket("ws", "ws://127.0.0.1:6700")
+    let socket = await new OnebotSocket("ws", "ws://127.0.0.1:6701")
     global.bili_config = new BiliBotConfig("config.json")
 
     // socket.addWSListener("PrintToConsole", (e) => {
@@ -34,8 +34,5 @@ async function main() {
 
     live_init(socket)
     dyno_init(socket)
-
-    let result = await biliAPI({mid: 7528074}, ['dynamics', 'uname'])
-    dynamics_notify(socket, result, [result.dynamics[10], result.dynamics[11]])
 }
 
